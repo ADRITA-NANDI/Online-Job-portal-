@@ -1,0 +1,11 @@
+/* Job seeker area: use the site fonts instead of the font set inline in each page file */
+#root .jobseeker-area,
+#root .jobseeker-area * {
+  font-family: "Inter", sans-serif !important;
+}
+
+#root .jobseeker-area h1,
+#root .jobseeker-area h2,
+#root .jobseeker-area h3 {
+  font-family: "Space Grotesk", sans-serif !important;
+}

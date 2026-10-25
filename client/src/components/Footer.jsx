@@ -40,7 +40,7 @@ export default function Footer() {
             <p className="text-sm font-semibold text-white">For employers</p>
             <ul className="mt-4 space-y-3 text-sm text-slate-400">
               <li><Link to="/post-job" className="transition-colors hover:text-accent">Post a job</Link></li>
-              <li><Link to="/employers" className="transition-colors hover:text-accent">Manage jobs</Link></li>
+              <li><Link to="/employer" className="transition-colors hover:text-accent">Manage jobs</Link></li>
               <li><Link to="/applicants" className="transition-colors hover:text-accent">View applicants</Link></li>
             </ul>
           </div>

@@ -1,58 +1,83 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Register() {
   const [role, setRole] = useState("seeker");
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (role === "seeker") {
+      navigate("/dashboard");
+    } else {
+      // Employer dashboard isn't built yet, so send them home for now
+      navigate("/");
+    }
+  };
 
   return (
-    <main className="relative min-h-[calc(100vh-73px)] overflow-hidden bg-mist">
-      <div
-        className="pointer-events-none absolute inset-0 -z-10"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 1px 1px, #D6DBE8 1px, transparent 0)",
-          backgroundSize: "28px 28px",
-          maskImage: "linear-gradient(to bottom, black, transparent 85%)",
-        }}
-      />
-      <div className="pointer-events-none absolute -top-40 right-1/4 -z-10 h-96 w-96 rounded-full bg-accent/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 left-0 -z-10 h-80 w-80 rounded-full bg-navy/10 blur-3xl" />
+    <main className="relative isolate min-h-[calc(100vh-73px)] overflow-hidden bg-gradient-to-br from-mist via-blue-50 to-indigo-100">
+      {/* Background blobs (what the glass blurs) */}
+      <div className="animate-float pointer-events-none absolute top-16 left-[8%] -z-10 h-80 w-80 rounded-full bg-accent/60 blur-3xl" />
+      <div className="animate-float-slow pointer-events-none absolute bottom-10 left-[22%] -z-10 h-72 w-72 rounded-full bg-cyan-400/50 blur-3xl" />
+      <div className="animate-float pointer-events-none absolute top-1/4 left-[30%] -z-10 h-64 w-64 rounded-full bg-fuchsia-400/30 blur-3xl" />
+      <div className="animate-float-slow pointer-events-none absolute top-1/3 right-[5%] -z-10 h-[26rem] w-[26rem] rounded-full bg-indigo-400/40 blur-3xl" />
 
       <div className="mx-auto grid max-w-5xl items-stretch gap-10 px-6 py-16 md:grid-cols-2">
-        {/* Branding panel */}
-        <div className="hidden h-full flex-col justify-center rounded-3xl bg-navy p-10 text-white md:flex">
-          <span className="font-display text-2xl font-semibold">
-            Job<span className="text-accent">Hub</span>
-          </span>
-          <h2 className="mt-6 font-display text-2xl font-semibold leading-snug">
-            Real openings, real applicants, no noise.
-          </h2>
-          <p className="mt-4 text-sm text-slate-300">
-            Join thousands of job seekers and employers already using JobHub
-            to hire and get hired faster.
-          </p>
-          <div className="mt-10 space-y-4">
-            <div className="rounded-xl bg-white/5 p-4">
-              <p className="font-display text-xl font-semibold">12,400+</p>
-              <p className="text-sm text-slate-400">Open roles right now</p>
-            </div>
-            <div className="rounded-xl bg-white/5 p-4">
-              <p className="font-display text-xl font-semibold">89%</p>
-              <p className="text-sm text-slate-400">Applied within a week</p>
+        {/* Branding panel (live dark glass) */}
+        <div className="relative hidden h-full flex-col justify-center overflow-hidden rounded-3xl border border-white/25 bg-navy/70 p-10 text-white shadow-2xl shadow-accent/20 backdrop-blur-2xl backdrop-saturate-150 md:flex">
+          {/* Moving lights inside the glass */}
+          <div className="animate-float pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-accent/60 blur-3xl" />
+          <div className="animate-float-slow pointer-events-none absolute -bottom-20 -left-16 h-64 w-64 rounded-full bg-cyan-400/40 blur-3xl" />
+          {/* Glossy top-left highlight */}
+          <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br from-white/20 via-transparent to-transparent" />
+          {/* Light streak sweeping across */}
+          <div className="animate-shimmer pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+
+          <div className="relative">
+            <span className="font-display text-2xl font-semibold">
+              Job<span className="text-blue-300">Hub</span>
+            </span>
+            <h2 className="mt-6 font-display text-2xl font-semibold leading-snug">
+              Real openings, real applicants, no noise.
+            </h2>
+            <p className="mt-4 text-sm text-slate-200">
+              Join thousands of job seekers and employers already using JobHub
+              to hire and get hired faster.
+            </p>
+
+            <div className="mt-10 space-y-3">
+              <div className="animate-bob rounded-xl border border-white/30 bg-white/15 p-4 shadow-lg backdrop-blur-lg transition-colors hover:bg-white/25">
+                <p className="font-display text-xl font-semibold">12,400+</p>
+                <p className="flex items-center gap-2 text-sm text-slate-200">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-300 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-300" />
+                  </span>
+                  Open roles right now
+                </p>
+              </div>
+              <div
+                className="animate-bob rounded-xl border border-white/30 bg-white/15 p-4 shadow-lg backdrop-blur-lg transition-colors hover:bg-white/25"
+                style={{ animationDelay: "1.4s" }}
+              >
+                <p className="font-display text-xl font-semibold">89%</p>
+                <p className="text-sm text-slate-200">Applied within a week</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Form panel */}
-        <div className="flex h-full flex-col justify-center rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        {/* Form panel (frosted glass) */}
+        <div className="flex h-full flex-col justify-center rounded-3xl border border-white/60 bg-white/40 p-8 shadow-xl shadow-accent/10 backdrop-blur-xl transition-shadow duration-300 hover:shadow-2xl hover:shadow-accent/20">
           <h1 className="font-display text-2xl font-semibold text-ink">
             Create your account
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-600">
             Join JobHub as a job seeker or an employer.
           </p>
 
-          <div className="mt-6 grid grid-cols-2 gap-2 rounded-lg bg-mist p-1">
+          <div className="mt-6 grid grid-cols-2 gap-2 rounded-lg border border-white/70 bg-white/50 p-1 backdrop-blur-md">
             <button
               type="button"
               onClick={() => setRole("seeker")}
@@ -79,7 +104,7 @@ export default function Register() {
             </button>
           </div>
 
-          <form className="mt-6 space-y-4">
+          <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="text-sm font-medium text-ink">
                 {role === "seeker" ? "Full name" : "Company name"}
@@ -87,7 +112,7 @@ export default function Register() {
               <input
                 type="text"
                 placeholder={role === "seeker" ? "Jane Doe" : "Acme Inc."}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-ink placeholder:text-slate-400 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                className="mt-1 w-full rounded-lg border border-white/70 bg-white/60 px-3 py-2 text-sm text-ink placeholder:text-slate-400 transition-all focus:border-accent focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
 
@@ -96,7 +121,7 @@ export default function Register() {
               <input
                 type="email"
                 placeholder="you@example.com"
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-ink placeholder:text-slate-400 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                className="mt-1 w-full rounded-lg border border-white/70 bg-white/60 px-3 py-2 text-sm text-ink placeholder:text-slate-400 transition-all focus:border-accent focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
 
@@ -105,19 +130,19 @@ export default function Register() {
               <input
                 type="password"
                 placeholder="At least 8 characters"
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-ink placeholder:text-slate-400 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                className="mt-1 w-full rounded-lg border border-white/70 bg-white/60 px-3 py-2 text-sm text-ink placeholder:text-slate-400 transition-all focus:border-accent focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full rounded-lg bg-ink py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-accent hover:shadow-md active:translate-y-0"
+              className="w-full rounded-lg bg-ink py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-accent hover:shadow-lg active:translate-y-0"
             >
               Create {role === "seeker" ? "seeker" : "employer"} account
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-500">
+          <p className="mt-6 text-center text-sm text-slate-600">
             Already have an account?{" "}
             <Link to="/login" className="font-medium text-accent hover:underline">
               Log in
