@@ -1,17 +1,34 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../firebase";
+import { useAuth } from "../Context/AuthContext";
 
 export default function Register() {
   const [role, setRole] = useState("seeker");
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (role === "seeker") {
-      navigate("/dashboard");
-    } else {
-      // Employer dashboard isn't built yet, so send them home for now
-      navigate("/");
+    setError("");
+    setLoading(true);
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
+      await updateProfile(cred.user, { displayName: name.trim() });
+      login({ name: name.trim() || email.split("@")[0], email: cred.user.email, role });
+      navigate(role === "seeker" ? "/dashboard" : "/employer");
+    } catch (err) {
+      if (err.code === "auth/email-already-in-use") setError("This email is already used.");
+      else if (err.code === "auth/weak-password") setError("Password must be at least 6 characters.");
+      else setError("Could not create the account. Check the details.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,6 +128,9 @@ export default function Register() {
               </label>
               <input
                 type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 placeholder={role === "seeker" ? "Jane Doe" : "Acme Inc."}
                 className="mt-1 w-full rounded-lg border border-white/70 bg-white/60 px-3 py-2 text-sm text-ink placeholder:text-slate-400 transition-all focus:border-accent focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
@@ -120,6 +140,9 @@ export default function Register() {
               <label className="text-sm font-medium text-ink">Email address</label>
               <input
                 type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 className="mt-1 w-full rounded-lg border border-white/70 bg-white/60 px-3 py-2 text-sm text-ink placeholder:text-slate-400 transition-all focus:border-accent focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
@@ -129,13 +152,18 @@ export default function Register() {
               <label className="text-sm font-medium text-ink">Password</label>
               <input
                 type="password"
-                placeholder="At least 8 characters"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="At least 6 characters"
                 className="mt-1 w-full rounded-lg border border-white/70 bg-white/60 px-3 py-2 text-sm text-ink placeholder:text-slate-400 transition-all focus:border-accent focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
 
+            {error && <p className="text-sm text-red-600">{error}</p>}
             <button
               type="submit"
+              disabled={loading}
               className="w-full rounded-lg bg-ink py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-accent hover:shadow-lg active:translate-y-0"
             >
               Create {role === "seeker" ? "seeker" : "employer"} account

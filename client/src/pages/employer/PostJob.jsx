@@ -4,12 +4,15 @@ import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/Admin/PageHeader";
 import { btn } from "../../components/Admin/styles";
 import { jobTypes } from "../../data/EmployerData";
+import { API_URL } from "../../api";
+import { useAuth } from "../../Context/AuthContext";
 
 const inputCls =
   "mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-ink transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20";
 
 export default function PostJob() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [form, setForm] = useState({
     title: "",
     type: jobTypes[0],
@@ -23,10 +26,36 @@ export default function PostJob() {
 
   const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Later: await fetch("/api/v1/jobs", { method: "POST", body: JSON.stringify(form) })
-    setSubmitted(true);
+    setSaving(true);
+    setSaveError("");
+    try {
+      const res = await fetch(`${API_URL}/api/jobs`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: form.title,
+          type: form.type,
+          location: form.location,
+          salaryMin: form.salaryMin ? Number(form.salaryMin) : undefined,
+          salaryMax: form.salaryMax ? Number(form.salaryMax) : undefined,
+          description: form.description,
+          requirements: form.requirements,
+          companyName: user?.name || "Employer",
+          postedByEmail: user?.email || "",
+        }),
+      });
+      if (!res.ok) throw new Error("Could not save the job");
+      setSubmitted(true);
+    } catch (err) {
+      setSaveError("Could not save the job. Is the server running?");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (submitted) {
@@ -112,8 +141,9 @@ export default function PostJob() {
           <p className="mt-3 text-sm leading-relaxed text-slate-600">
             {form.description || "Description will appear here."}
           </p>
-          <button type="submit" className={btn + " mt-6 w-full text-center"}>
-            Publish job
+          {saveError && <p className="mt-4 text-sm text-red-600">{saveError}</p>}
+          <button type="submit" disabled={saving} className={btn + " mt-6 w-full text-center"}>
+            {saving ? "Saving..." : "Publish job"}
           </button>
         </aside>
       </form>

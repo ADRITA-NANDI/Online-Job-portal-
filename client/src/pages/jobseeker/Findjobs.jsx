@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, MapPin, Heart, Loader2, ExternalLink } from "lucide-react";
 import { getSavedJobs, toggleSavedJob } from "../../utils/savedJobs";
+import { API_URL } from "../../api";
 
 const MOCK_JOBS = [
   {
@@ -107,6 +108,7 @@ export default function FindJobs() {
   const [appliedIds, setAppliedIds] = useState([]);
 
   const [apiJobs, setApiJobs] = useState([]);
+  const [dbJobs, setDbJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -166,7 +168,48 @@ export default function FindJobs() {
     fetchRealJobs();
   }, []);
 
-  const ALL_JOBS = [...apiJobs, ...MOCK_JOBS];
+  // Jobs saved in our own MongoDB. Checked again every 5 seconds.
+  useEffect(() => {
+    let stop = false;
+    const typeMap = { "Full-time": "Full Time", "Part-time": "Part Time" };
+
+    async function loadDbJobs() {
+      try {
+        const res = await fetch(`${API_URL}/api/jobs`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (stop) return;
+        setDbJobs(
+          data.map((j) => ({
+            id: `db-${j._id}`,
+            title: j.title,
+            company: j.companyName || "Employer",
+            location: j.location,
+            type: typeMap[j.type] || j.type,
+            salary:
+              j.salaryMin || j.salaryMax
+                ? `TK ${j.salaryMin || "?"} - ${j.salaryMax || "?"}/month`
+                : "Not specified",
+            letter: (j.companyName || "E").charAt(0).toUpperCase(),
+            tags: [],
+            isReal: false,
+            description: j.description,
+          }))
+        );
+      } catch (err) {
+        // server not running: just show the other jobs
+      }
+    }
+
+    loadDbJobs();
+    const timer = setInterval(loadDbJobs, 5000);
+    return () => {
+      stop = true;
+      clearInterval(timer);
+    };
+  }, []);
+
+  const ALL_JOBS = [...dbJobs, ...apiJobs, ...MOCK_JOBS];
 
   const filtered = ALL_JOBS.filter((job) => {
     const matchesSearch =

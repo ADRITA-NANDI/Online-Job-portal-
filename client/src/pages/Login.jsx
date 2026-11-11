@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../Context/AuthContext";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
 // Demo admin account (replace with real backend auth later)
 const ADMIN_EMAIL = "admin@jobhub.com";
@@ -24,7 +26,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -41,10 +43,15 @@ export default function Login() {
       return;
     }
 
-    const displayName =
-      name.trim() || email.split("@")[0] || "Guest User";
-    login({ name: displayName, email, role });
-    navigate(HOME[role]);
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
+      const displayName =
+        cred.user.displayName || name.trim() || email.split("@")[0] || "User";
+      login({ name: displayName, email: cred.user.email, role });
+      navigate(HOME[role]);
+    } catch (err) {
+      setError("Wrong email or password.");
+    }
   };
 
   const roleBtn = (value, label) => (
