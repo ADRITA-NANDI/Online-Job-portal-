@@ -1,0 +1,12 @@
+{
+  "name": "job-portal-server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test-db": "node testDb.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.5.0"
+  }
+}
